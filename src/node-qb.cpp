@@ -31,7 +31,12 @@ void Method(const FunctionCallbackInfo<Value>& args) {
 	
 	IMsgSetResponse^ response = sm->DoRequestsFromXMLString(requestXML);
 	CString responseXML(response->ToXMLString());
-	args.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, responseXML));
+	//args.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, responseXML));
+
+	Local<Function> cb = Local<Function>::Cast(args[2]);
+ 	const unsigned argc = 1;
+  	Local<Value> argv[argc] = { v8::String::NewFromUtf8(isolate, responseXML) };
+  	cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
 
 #pragma unmanaged

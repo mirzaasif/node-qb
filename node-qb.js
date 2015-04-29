@@ -4,8 +4,11 @@ var query = '<?xml version="1.0"?>' +
             '<?qbxml version="12.0"?>' +
 			'<QBXML>' +
   				'<QBXMLMsgsRq onError="stopOnError">' +
-    				'<CompanyQueryRq  requestID="1">' +
-      				'</CompanyQueryRq >' +
+    				'<ItemQueryRq  requestID="1">' +
+      				'</ItemQueryRq >' +
   				'</QBXMLMsgsRq>' +
 			'</QBXML>';
-console.log(node_qb.hello("node-qb-demo", query));
+node_qb.hello("node-qb-demo", query, function(response)
+{
+	console.log(response);
+});
