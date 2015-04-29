@@ -15,17 +15,25 @@ void Method(const FunctionCallbackInfo<Value>& args) {
 	HandleScope scope(isolate);
 
 	//convert args to v8 utfvalue. for char* use * as operator
-	v8::String::Utf8Value a(args[0]);
+	v8::String::Utf8Value appName(args[0]);
+	v8::String::Utf8Value query(args[1]);
 
-	System::String^ applicationName = gcnew System::String(*a);
+
+	System::String^ applicationName = gcnew System::String(*appName);
+	System::String^ requestXML = gcnew System::String(*query);
+
 
 	QBSessionManager^ sm = gcnew QBSessionManager();
 	sm->OpenConnection("test", applicationName);
 	sm->BeginSession("", ENOpenMode::omDontCare);
 	System::String^ filePath = sm->GetCurrentCompanyFileName();
 	CString str(filePath);
-	args.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, str));
+	
+	IMsgSetResponse^ response = sm->DoRequestsFromXMLString(requestXML);
+	CString responseXML(response->ToXMLString());
+	args.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, responseXML));
 }
+
 #pragma unmanaged
 void init(Handle<v8::Object> target) {
 	NODE_SET_METHOD(target, "hello", Method);
