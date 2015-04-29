@@ -18,24 +18,32 @@ void Method(const FunctionCallbackInfo<Value>& args) {
 	v8::String::Utf8Value appName(args[0]);
 	v8::String::Utf8Value query(args[1]);
 
+	Local<Function> cb = Local<Function>::Cast(args[2]);
+ 	const unsigned argc = 1;
+ 	CString *responseXML = NULL;
 
 	System::String^ applicationName = gcnew System::String(*appName);
 	System::String^ requestXML = gcnew System::String(*query);
 
+	try
+	{
+		QBSessionManager^ sm = gcnew QBSessionManager();
+		sm->OpenConnection("test", applicationName);
+		sm->BeginSession("", ENOpenMode::omDontCare);
+		System::String^ filePath = sm->GetCurrentCompanyFileName();
+		CString str(filePath);
+		
+		IMsgSetResponse^ response = sm->DoRequestsFromXMLString(requestXML);
+		responseXML = new CString(response->ToXMLString());
+	}catch(System::Exception^ e)
+	{
+		responseXML = new CString(e->Message);
+	}
 
-	QBSessionManager^ sm = gcnew QBSessionManager();
-	sm->OpenConnection("test", applicationName);
-	sm->BeginSession("", ENOpenMode::omDontCare);
-	System::String^ filePath = sm->GetCurrentCompanyFileName();
-	CString str(filePath);
-	
-	IMsgSetResponse^ response = sm->DoRequestsFromXMLString(requestXML);
-	CString responseXML(response->ToXMLString());
 	//args.GetReturnValue().Set(v8::String::NewFromUtf8(isolate, responseXML));
-
-	Local<Function> cb = Local<Function>::Cast(args[2]);
- 	const unsigned argc = 1;
-  	Local<Value> argv[argc] = { v8::String::NewFromUtf8(isolate, responseXML) };
+	
+  	Local<Value> argv[argc] = { v8::String::NewFromUtf8(isolate, *responseXML) };
+  	delete responseXML;
   	cb->Call(isolate->GetCurrentContext()->Global(), argc, argv);
 }
 

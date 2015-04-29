@@ -4,11 +4,12 @@ var query = '<?xml version="1.0"?>' +
             '<?qbxml version="12.0"?>' +
 			'<QBXML>' +
   				'<QBXMLMsgsRq onError="stopOnError">' +
-    				'<ItemQueryRq  requestID="1">' +
-      				'</ItemQueryRq >' +
+    				'<AccountQueryRq  requestID="1">' +
+      				'</AccountQueryRq >' +
   				'</QBXMLMsgsRq>' +
 			'</QBXML>';
 node_qb.hello("node-qb-demo", query, function(response)
 {
 	console.log(response);
+	console.log("This is good");
 });
